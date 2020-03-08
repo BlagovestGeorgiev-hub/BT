@@ -1,6 +1,10 @@
 package data;
 
+import interfaces.TextParser;
+import models.DataHolder;
 import models.Product;
+import models.SubTag;
+import models.Tag;
 
 import java.io.IOException;
 import java.nio.file.Files;
@@ -11,26 +15,28 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.util.stream.Stream;
 
-public class TextParser {
+public class TextParserImpl implements TextParser {
 
-    private HashMap<String, HashMap<String, ArrayList<Product>>> textObjs;
+    public static final String SRC_MAIN_RESOURCES_TEXT_DATA_TXT = ".\\src\\main\\resources\\TextData.txt";
+    private DataHolder dataHolder;
     private String lastTag;
     private String lastSubTag;
 
-    public TextParser(){
-        textObjs = new HashMap<>();
+    public TextParserImpl(){
+        dataHolder = new DataHolder();
     }
 
-    public void ReadFile(){
-        try (Stream<String> stream = Files.lines(Paths.get(".\\src\\main\\resources\\TextData.txt"))) {
+    public void readData(){
+        this.dataHolder = new DataHolder();
+        try (Stream<String> stream = Files.lines(Paths.get(SRC_MAIN_RESOURCES_TEXT_DATA_TXT))) {
             stream.forEach(l -> {
                 if (l.trim().startsWith("<")){
-                    Pattern pattern = Pattern.compile("^<(\\w+\\s*?\\S*?)$");
+                    Pattern pattern = Pattern.compile("^<(\\w+\\s*?\\S*?)>$");
                     Matcher matcher = pattern.matcher(l);
                     if (matcher.matches()){
                         String group  = matcher.group(1);
                         lastTag = group;
-                        textObjs.put(group, new HashMap<>());
+                        dataHolder.addTag(new Tag(group, new ArrayList<>()));
                     }
                 }
                 if (l.trim().startsWith("_")){
@@ -39,7 +45,11 @@ public class TextParser {
                     if (matcher.matches()){
                         String group  = matcher.group(1);
                         lastSubTag = group;
-                        textObjs.get(lastTag).put(lastSubTag, new ArrayList<>());
+                        dataHolder.getTags().stream().forEach( t -> {
+                            if (t.getTagName().equals(lastTag)){
+                                t.getSubTags().add(new SubTag(group, new ArrayList<>()));
+                            }
+                        });
                     }
                 }
                 if (l.trim().startsWith("*")){
@@ -47,13 +57,24 @@ public class TextParser {
                     Matcher matcher = pattern.matcher(l.trim());
                     if (matcher.matches()){
                         Product  pr = new Product(matcher.group(1), Double.parseDouble(matcher.group(2)),matcher.group(3));
-                        System.out.println(pr);
-                        textObjs.get(lastTag).get(lastSubTag).add(pr);
+                        dataHolder.getTags().stream().forEach( t -> {
+                            if (t.getTagName().equals(lastTag)){
+                                t.getSubTags().forEach(st -> {
+                                    if (st.getTagName().equals(lastSubTag)){
+                                        st.getProducts().add(pr);
+                                    }
+                                });
+                            }
+                        });
                     }
                 }
             });
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public DataHolder getData() {
+        return dataHolder;
     }
 }

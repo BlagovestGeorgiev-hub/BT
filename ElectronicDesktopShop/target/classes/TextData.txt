@@ -1,33 +1,33 @@
 <clothes Tops>
 	_Nike
-		*Jack and Jones,9.99,images/jackAndJones.jpg
-		*Christian Dior,25.00,images/dior.jpg
+		*Jack and Jones,1.99,images/jackAndJones.jpg
+		*Christian Dior,2.00,images/dior.jpg
 	_Puma
-		*Burberry jacket,500.00,images/burberryJacket.jpg
-		*Christian Dior jacket,800.00,images/diorJacket.jpg
+		*Burberry jacket,3.00,images/burberryJacket.jpg
+		*Christian Dior jacket,4.00,images/diorJacket.jpg
 	_Addidas
-		*Burberry jacket,500.00,images/burberryJacket.jpg
-		*Christian Dior jacket,800.00,images/diorJacket.jpg
+		*Burberry jacket,5.00,images/burberryJacket.jpg
+		*Christian Dior jacket,6.00,images/diorJacket.jpg
 </clothes>
 <clothes Bottom>
 	_Nike
-		*Jack and Jones,9.99,images/jackAndJones.jpg
-		*Christian Dior,25.00,images/dior.jpg
+		*Jack and Jones,7.99,images/jackAndJones.jpg
+		*Christian Dior,8.00,images/dior.jpg
 	_Puma
-		*Burberry jacket,500.00,images/burberryJacket.jpg
-		*Christian Dior jacket,800.00,images/diorJacket.jpg
+		*Burberry jacket,9.00,images/burberryJacket.jpg
+		*Christian Dior jacket,10.00,images/diorJacket.jpg
 	_Addidas
-		*Burberry jacket,500.00,images/burberryJacket.jpg
-		*Christian Dior jacket,800.00,images/diorJacket.jpg
+		*Burberry jacket,11.00,images/burberryJacket.jpg
+		*Christian Dior jacket,12.00,images/diorJacket.jpg
 </clothes>
 <Shoes>
 	_Nike
-		*Jack and Jones,9.99,images/jackAndJones.jpg
-		*Christian Dior,25.00,images/dior.jpg
+		*Jack and Jones,13.99,images/jackAndJones.jpg
+		*Christian Dior,14.00,images/dior.jpg
 	_Puma
-		*Burberry jacket,500.00,images/burberryJacket.jpg
-		*Christian Dior jacket,800.00,images/diorJacket.jpg
+		*Burberry jacket,15.00,images/burberryJacket.jpg
+		*Christian Dior jacket,16.00,images/diorJacket.jpg
 	_Addidas
-		*Burberry jacket,500.00,images/burberryJacket.jpg
-		*Christian Dior jacket,800.00,images/diorJacket.jpg
+		*Burberry jacket,17.00,images/burberryJacket.jpg
+		*Christian Dior jacket,18.00,images/diorJacket.jpg
 </Shoes>
