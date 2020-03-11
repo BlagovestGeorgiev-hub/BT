@@ -1,6 +1,6 @@
 package listeners;
 
-import gui.MainFrame;
+import interfaces.postEventHandlers.SubTagPostEventHandler;
 
 import javax.swing.*;
 import java.awt.event.MouseEvent;
@@ -10,10 +10,10 @@ import static global.Constants.TAG_SUBTAG_SEPARATOR;
 
 public class SubTagListener implements MouseListener {
 
-    private MainFrame mainFrame;
+    private SubTagPostEventHandler frame;
 
-    public SubTagListener(MainFrame frame) {
-        this.mainFrame = frame;
+    public SubTagListener(SubTagPostEventHandler frame) {
+        this.frame = frame;
     }
 
     @Override
@@ -21,11 +21,11 @@ public class SubTagListener implements MouseListener {
         String label = ((JLabel) e.getSource()).getText();
 
         String[] split = label.trim().split(TAG_SUBTAG_SEPARATOR);
-        mainFrame.setTagPressed(split[0]);
-        mainFrame.setSubTagPressed(split[1]);
-        mainFrame.setSubTagPressed(true);
+        frame.setTagPressed(split[0]);
+        frame.setSubTagPressed(split[1]);
+        frame.setSubTagPressed(true);
 
-        mainFrame.createAndShowGUI();
+        frame.createAndShowGUI();
     }
 
     @Override

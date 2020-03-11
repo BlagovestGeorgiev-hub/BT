@@ -16,4 +16,7 @@ public class Constants {
 
     public static final String TAG_SUBTAG_SEPARATOR = " : ";
 
+    public static final String ORDER_BY_NAME = "Order By Name";
+
+    public static final String ORDER_BY_PRICE = "Order By Price";
 }

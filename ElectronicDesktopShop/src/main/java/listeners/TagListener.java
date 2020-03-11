@@ -1,6 +1,6 @@
 package listeners;
 
-import gui.MainFrame;
+import interfaces.postEventHandlers.TagPostEventHandler;
 import models.Tag;
 
 import javax.swing.*;
@@ -9,24 +9,24 @@ import java.awt.event.MouseListener;
 
 public class TagListener implements MouseListener {
 
-    private MainFrame mainFrame;
+    private TagPostEventHandler frame;
 
-    public TagListener(MainFrame frame) {
-        this.mainFrame = frame;
+    public TagListener(TagPostEventHandler frame) {
+        this.frame = frame;
     }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         String label = ((JLabel) e.getSource()).getText();
 
-        for (Tag tag : this.mainFrame.getData().getTags()) {
+        for (Tag tag : this.frame.getData().getTags()) {
             if (tag.getTagName().equals(label)) {
-                this.mainFrame.getTagsPressed().add(label);
+                this.frame.getTagsPressed().add(label);
                 break;
             }
         }
 
-        mainFrame.createAndShowGUI();
+        frame.createAndShowGUI();
     }
 
     @Override

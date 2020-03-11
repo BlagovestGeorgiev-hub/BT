@@ -1,5 +1,7 @@
 package models;
 
+import java.util.Objects;
+
 public class Product {
 
     private String name;
@@ -36,6 +38,20 @@ public class Product {
 
     public void setPathToPicture(String pathToPicture) {
         this.pathToPicture = pathToPicture;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+
+        Product product = (Product) o;
+        return Double.compare(product.price, price) == 0 &&
+                name.equals(product.name) &&
+                pathToPicture.equals(product.pathToPicture);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(name, price, pathToPicture);
     }
 
     @Override

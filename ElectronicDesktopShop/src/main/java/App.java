@@ -1,6 +1,6 @@
 import data.ImageLoaderImpl;
 import data.TextParserImpl;
-import gui.MainFrame;
+import gui.MainFrameImpl;
 
 import javax.swing.*;
 
@@ -14,7 +14,7 @@ public class App {
         UIManager.put("swing.boldMetal", Boolean.FALSE);
         javax.swing.SwingUtilities.invokeLater(new Runnable() {
             public void run() {
-                MainFrame mf = new MainFrame(new TextParserImpl(), new ImageLoaderImpl());
+                MainFrameImpl mf = new MainFrameImpl(new TextParserImpl(), new ImageLoaderImpl());
                 mf.createAndShowGUI();
             }
         });

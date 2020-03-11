@@ -5,19 +5,20 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.Map;
 
 import global.Constants;
-import interfaces.ImageLoader;
-import interfaces.TextParser;
-import listeners.AddToCartListener;
-import listeners.SubTagListener;
-import listeners.TagListener;
+import interfaces.*;
+import interfaces.postEventHandlers.*;
+import listeners.*;
 import models.DataHolder;
 import models.Product;
 import models.SubTag;
 import models.Tag;
 
-public class MainFrame {
+public class MainFrameImpl implements AddToCartPostEventHandler, OrderByNamePostEventHandler, OrderByPricePostEventHandler, SubTagPostEventHandler, TagPostEventHandler {
 
     public static final String SUB_TAG_PREFIX = "       ";
 
@@ -33,20 +34,33 @@ public class MainFrame {
     private boolean isSubTagPressed;
     private String tagPressed;
     private String subTagPressed;
+    private Map<Product, Integer> productsInCarHolder;
 
     private MouseListener tagListener;
     private MouseListener subTagListener;
     private MouseListener addToCartListener;
+    private MouseListener globalShoppingCarListener;
+    private MouseListener orderByNameListener;
+    private MouseListener orderByPriceListener;
 
+    private boolean defaultOrderByName;
+    private boolean defaultOrderByPrice;
 
-    public MainFrame(TextParser textParser, ImageLoader imageLoader) {
+    public MainFrameImpl(TextParser textParser, ImageLoader imageLoader) {
         this.jFrame = new JFrame("Desktop Shop");
         this.textParser = textParser;
         this.tagsPressed = new ArrayList<>();
         this.imageLoader = imageLoader;
         this.tagListener = new TagListener(this);
         this.subTagListener = new SubTagListener(this);
-        this.addToCartListener =  new AddToCartListener(this);
+        this.addToCartListener = new AddToCartListener(this);
+        this.globalShoppingCarListener = new GlobalShoppingCarListener(this);
+        this.orderByNameListener = new OrderByNameListener(this);
+        this.orderByPriceListener = new OrderByPriceListener(this);
+
+        this.productsInCarHolder = new HashMap<>();
+        this.defaultOrderByName = false;
+        this.defaultOrderByPrice = true;
     }
 
     public DataHolder getData() {
@@ -69,19 +83,41 @@ public class MainFrame {
         this.subTagPressed = subTagPressed;
     }
 
+    public Map<Product, Integer> getProductsInCarHolder() {
+        return productsInCarHolder;
+    }
+
+    public void setProductsInCarHolder(Map<Product, Integer> productsInCarHolder) { this.productsInCarHolder = productsInCarHolder; }
+
+    public String getTagPressed() {
+        return tagPressed;
+    }
+
+    public String getSubTagPressed() {
+        return subTagPressed;
+    }
+
+    public void setDefaultOrderByName(boolean defaultOrderByName) {
+        this.defaultOrderByName = defaultOrderByName;
+    }
+
+    public void setDefaultOrderByPrice(boolean defaultOrderByPrice) {
+        this.defaultOrderByPrice = defaultOrderByPrice;
+    }
+
     public void createAndShowGUI() {
         Container contentPane = this.jFrame.getContentPane();
         contentPane.removeAll();
         contentPane.repaint();
 
-        //Shop name in a JPanel
-        contentPane.add(getShopName(), BorderLayout.PAGE_START);
+        contentPane.setLayout(new BorderLayout(1, 1));
+        contentPane.add(constructShopName(), BorderLayout.PAGE_START);
 
         contentPane.add(constructShopTagsAndSubTags(tagsPressed), BorderLayout.LINE_START);
         if (isSubTagPressed) {
-            contentPane.add(getShopProducts(), BorderLayout.CENTER);
+            contentPane.add(constructMainShopWindow(), BorderLayout.CENTER);
         } else {
-            //show welcome screen
+            contentPane.add(constructWelcomeScreen(), BorderLayout.CENTER);
         }
 
         this.jFrame.pack();
@@ -90,7 +126,84 @@ public class MainFrame {
         this.jFrame.setResizable(false);
     }
 
-    private JPanel getShopProducts() {
+    private JPanel constructWelcomeScreen(){
+        JPanel welcomeScreenHolder = new JPanel(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        JLabel welcome = new JLabel("WELCOME !!!");
+        welcome.setFont(new Font(welcome.getFont().getName(), Font.BOLD, 25));
+        c.gridx = 0;
+        c.gridy = 0;
+        welcomeScreenHolder.add(welcome, c);
+
+        JLabel informationMessage = new JLabel("Please, select a category.");
+        informationMessage.setFont(new Font(informationMessage.getFont().getName(), Font.BOLD, 15));
+        c.gridx = 0;
+        c.gridy = 1;
+        welcomeScreenHolder.add(informationMessage, c);
+
+        welcomeScreenHolder.setBorder(BorderFactory.createLineBorder(Color.black));
+        return welcomeScreenHolder;
+    }
+
+    private JPanel constructMainShopWindow() {
+        JPanel productsHolder = new JPanel();
+        productsHolder.setLayout(new GridBagLayout());
+        GridBagConstraints c = new GridBagConstraints();
+
+        JPanel shopProductsPanel = constructShopProducts(this.defaultOrderByName, this.defaultOrderByPrice);
+        shopProductsPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+        c.gridx = 0;
+        c.gridy = 0;
+        c.gridwidth = 3;
+        productsHolder.add(shopProductsPanel, c);
+
+
+        ArrayList<JLabel> orderByLabels = new ArrayList<>();
+        getJLabelFromString(orderByLabels, Constants.ORDER_BY_NAME);
+        orderByLabels.get(orderByLabels.size() - 1).addMouseListener(this.orderByNameListener);
+
+        getJLabelFromString(orderByLabels, Constants.ORDER_BY_PRICE);
+        orderByLabels.get(orderByLabels.size() - 1).addMouseListener(this.orderByPriceListener);
+
+        c.gridx = 0;
+        c.gridy = 1;
+        c.gridwidth = 1;
+        orderByLabels.get(0).setBorder(BorderFactory.createLineBorder(Color.black));
+        productsHolder.add(orderByLabels.get(0), c);
+
+        c.gridx = 1;
+        c.gridy = 1;
+        orderByLabels.get(1).setBorder(BorderFactory.createLineBorder(Color.black));
+        productsHolder.add(orderByLabels.get(1), c);
+
+        JPanel shoppingCartHolderPanel = constructShoppingCartHolder();
+        c.gridx = 2;
+        c.gridy = 1;
+        shoppingCartHolderPanel.setBorder(BorderFactory.createLineBorder(Color.black));
+        productsHolder.add(shoppingCartHolderPanel, c);
+
+        JPanel infoMessageHolder = new JPanel(new GridBagLayout());
+        GridBagConstraints gc = new GridBagConstraints();
+        gc.fill = GridBagConstraints.VERTICAL;
+        JLabel shopItemsInfoMessageFirstPart = new JLabel("You have " + this.productsInCarHolder.size());
+        shopItemsInfoMessageFirstPart.setFont(new Font(shopItemsInfoMessageFirstPart.getFont().getName(), Font.BOLD, 15));
+        infoMessageHolder.add(shopItemsInfoMessageFirstPart, gc);
+        JLabel shopItemsInfoMessageSecondPart = new JLabel(" products in the cart.");
+        shopItemsInfoMessageSecondPart.setFont(new Font(shopItemsInfoMessageSecondPart.getFont().getName(), Font.BOLD, 15));
+        infoMessageHolder.setBorder(BorderFactory.createLineBorder(Color.black));
+        infoMessageHolder.add(shopItemsInfoMessageSecondPart, gc);
+
+        c.gridx = 0;
+        c.gridy = 2;
+        c.gridwidth = 3;
+        productsHolder.add(infoMessageHolder, c);
+
+
+        return productsHolder;
+    }
+
+    private JPanel constructShopProducts(boolean orderByName, boolean orderByPrice) {
         JPanel productsPanel = new JPanel();
         ArrayList<Product> products = new ArrayList<>();
 
@@ -104,7 +217,22 @@ public class MainFrame {
             }
         }
 
-        // TODO Sorting of products must be here
+        if (orderByName) {
+            products.sort(new Comparator<Product>() {
+                @Override
+                public int compare(Product o1, Product o2) {
+                    return o1.getName().compareToIgnoreCase(o2.getName());
+                }
+            });
+        }
+        if (orderByPrice) {
+            products.sort(new Comparator<Product>() {
+                @Override
+                public int compare(Product o1, Product o2) {
+                    return Double.compare(o1.getPrice(), o2.getPrice());
+                }
+            });
+        }
 
         ArrayList<JLabel> productPicAsJLabels = new ArrayList<>();
         ArrayList<JLabel> productNamesAsJLabels = new ArrayList<>();
@@ -124,15 +252,15 @@ public class MainFrame {
             getJLabelFromString(productPricesAsJLabels, String.valueOf(pr.getPrice()) + Constants.PRODUCT_PRICE_SUFFIX);
         }
 
-        BufferedImage bufferedImage = imageLoader.loadImageInPreferredSize(
+        BufferedImage shoppingCar20x20 = imageLoader.loadImageInPreferredSize(
                 Constants.PREFERRED_CAR_PICTURE_PATH, Constants.PREFERRED_CAR_PICTURE_FOR_PRODUCT_WIDTH, Constants.PREFERRED_CAR_PICTURE_FOR_PRODUCT_HEIGHT);
 
-        constructUIRelatedProductHolder(productsPanel, productPicAsJLabels, productNamesAsJLabels, productPricesAsJLabels, bufferedImage);
+        constructUIRelatedProductHolder(productsPanel, productPicAsJLabels, productNamesAsJLabels, productPricesAsJLabels, shoppingCar20x20);
 
         return productsPanel;
     }
 
-    private void constructUIRelatedProductHolder(JPanel productsPanel, ArrayList<JLabel> productPicAsJLabels, ArrayList<JLabel> productNamesAsJLabels, ArrayList<JLabel> productPricesAsJLabels, BufferedImage bufferedImage) {
+    private void constructUIRelatedProductHolder(JPanel productsPanel, ArrayList<JLabel> productPicAsJLabels, ArrayList<JLabel> productNamesAsJLabels, ArrayList<JLabel> productPricesAsJLabels, BufferedImage shoppingCar20x20) {
         for (int i = 0; i < productPicAsJLabels.size(); i++) {
             JPanel currentProductPanel = new JPanel();
             currentProductPanel.setLayout(new GridBagLayout());
@@ -163,10 +291,11 @@ public class MainFrame {
 
             //Product car and spinner
             JPanel innerHolder = new JPanel();
-            JLabel label = new JLabel(new ImageIcon(bufferedImage));
+            JLabel label = new JLabel(new ImageIcon(shoppingCar20x20));
             label.addMouseListener(this.addToCartListener);
             innerHolder.add(label);
-            innerHolder.add(new JSpinner());
+            SpinnerModel model = new SpinnerNumberModel(0, 0, 1000, 1);
+            innerHolder.add(new JSpinner(model));
             c.fill = GridBagConstraints.CENTER;
             c.gridwidth = 2;
             c.gridx = 1;
@@ -177,13 +306,25 @@ public class MainFrame {
         }
     }
 
+    private JPanel constructShoppingCartHolder() {
+        BufferedImage shoppingCar20x20 = imageLoader.loadImageInPreferredSize(
+                Constants.PREFERRED_CAR_PICTURE_PATH, Constants.PREFERRED_CAR_PICTURE_FOR_PRODUCT_WIDTH, Constants.PREFERRED_CAR_PICTURE_FOR_PRODUCT_HEIGHT);
+
+        //Product shopping car and sorting buttons
+        JPanel shoppingHolder = new JPanel();
+        JLabel shoppingCarLabel = new JLabel(new ImageIcon(shoppingCar20x20));
+        shoppingCarLabel.addMouseListener(this.globalShoppingCarListener);
+        shoppingHolder.add(shoppingCarLabel);
+        return shoppingHolder;
+    }
+
     private void getJLabelFromString(ArrayList<JLabel> productNamesAsJLabels, String name) {
         JLabel label = new JLabel(name);
         label.setFont(new Font(label.getFont().getName(), Font.BOLD, 15));
         productNamesAsJLabels.add(label);
     }
 
-    private JPanel getShopName() {
+    private JPanel constructShopName() {
         JPanel shopName = new JPanel();
         JLabel text = new JLabel("Blago's super expensive high quality  shop.");
         text.setFont(new Font(text.getFont().getName(), Font.BOLD, 15));
