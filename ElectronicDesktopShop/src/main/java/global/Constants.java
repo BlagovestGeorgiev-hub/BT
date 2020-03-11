@@ -19,4 +19,6 @@ public class Constants {
     public static final String ORDER_BY_NAME = "Order By Name";
 
     public static final String ORDER_BY_PRICE = "Order By Price";
+
+    public static final String SUB_TAG_PREFIX = "       ";
 }
