@@ -21,4 +21,18 @@ public class Constants {
     public static final String ORDER_BY_PRICE = "Order By Price";
 
     public static final String SUB_TAG_PREFIX = "       ";
+
+    public static final String INVOICES = "Invoice";
+
+    public static final String OVERALL = "Overall" ;
+
+    public static final String PRICE = "Price";
+
+    public static final String COUNT = "Count";
+
+    public static final String PRODUCT_ORDER_ASC = "Product name ▼";
+
+    public static final String PRODUCT_ORDER_DESC = "Product name ▲";
+
+    public static final String CSV_SEPARATOR = ", ";
 }

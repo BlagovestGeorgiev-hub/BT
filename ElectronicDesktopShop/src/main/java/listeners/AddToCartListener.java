@@ -34,40 +34,42 @@ public class AddToCartListener implements MouseListener {
             }
         }
 
-        Map<Product, Integer> productsInCarHolder = addToCartPostEventHandler.getProductsInCarHolder();
-        DataHolder data = addToCartPostEventHandler.getData();
+        if (currentValue > 0){
+            Map<Product, Integer> productsInCarHolder = addToCartPostEventHandler.getProductsInCarHolder();
+            DataHolder data = addToCartPostEventHandler.getData();
 
-        JLabel productAsJLabel = (JLabel) (productUIContainerComponents[0]);
-        boolean breakSequence = false;
-        for (Tag tag : data.getTags()) {
-            if (tag.getTagName().equals(addToCartPostEventHandler.getTagPressed())) {
-                for (SubTag subTag : tag.getSubTags()) {
-                    if (subTag.getTagName().equals(addToCartPostEventHandler.getSubTagPressed())) {
-                        for (Product product : subTag.getProducts()) {
-                            if (product.getName().equals(productAsJLabel.getText())) {
-                                if (productsInCarHolder.containsKey(product)) {
-                                    productsInCarHolder.replace(product, productsInCarHolder.get(product) + currentValue);
-                                } else {
-                                    productsInCarHolder.put(product, currentValue);
+            JLabel productAsJLabel = (JLabel) (productUIContainerComponents[0]);
+            boolean breakSequence = false;
+            for (Tag tag : data.getTags()) {
+                if (tag.getTagName().equals(addToCartPostEventHandler.getTagPressed())) {
+                    for (SubTag subTag : tag.getSubTags()) {
+                        if (subTag.getTagName().equals(addToCartPostEventHandler.getSubTagPressed())) {
+                            for (Product product : subTag.getProducts()) {
+                                if (product.getName().equals(productAsJLabel.getText())) {
+                                    if (productsInCarHolder.containsKey(product)) {
+                                        productsInCarHolder.replace(product, productsInCarHolder.get(product) + currentValue);
+                                    } else {
+                                        productsInCarHolder.put(product, currentValue);
+                                    }
+                                    breakSequence = true;
                                 }
-                                breakSequence = true;
-                            }
-                            if (breakSequence) {
-                                break;
+                                if (breakSequence) {
+                                    break;
+                                }
                             }
                         }
-                    }
-                    if (breakSequence) {
-                        break;
+                        if (breakSequence) {
+                            break;
+                        }
                     }
                 }
+                if (breakSequence) {
+                    break;
+                }
             }
-            if (breakSequence) {
-                break;
-            }
+            addToCartPostEventHandler.setProductsInCarHolder(productsInCarHolder);
+            addToCartPostEventHandler.createAndShowGUI();
         }
-        addToCartPostEventHandler.setProductsInCarHolder(productsInCarHolder);
-        addToCartPostEventHandler.createAndShowGUI();
     }
 
     @Override

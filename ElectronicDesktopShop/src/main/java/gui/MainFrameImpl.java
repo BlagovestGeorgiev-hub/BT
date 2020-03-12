@@ -5,6 +5,7 @@ import java.awt.*;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 import global.Constants;
@@ -14,7 +15,8 @@ import listeners.*;
 import models.DataHolder;
 import models.Product;
 
-public class MainFrameImpl implements AddToCartPostEventHandler, OrderByNamePostEventHandler, OrderByPricePostEventHandler, SubTagPostEventHandler, TagPostEventHandler {
+public class MainFrameImpl implements AddToCartPostEventHandler, OrderByNamePostEventHandler,
+        OrderByPricePostEventHandler, SubTagPostEventHandler, TagPostEventHandler, GlobalShoppingCarPostEventHandler {
     private JFrame jFrame;
 
     private DataHolder data;
@@ -56,7 +58,7 @@ public class MainFrameImpl implements AddToCartPostEventHandler, OrderByNamePost
         this.orderByNameListener = new OrderByNameListener(this);
         this.orderByPriceListener = new OrderByPriceListener(this);
 
-        this.productsInCarHolder = new HashMap<>();
+        this.productsInCarHolder = new LinkedHashMap<>();
         this.defaultOrderByName = false;
         this.defaultOrderByPrice = true;
 
@@ -155,6 +157,10 @@ public class MainFrameImpl implements AddToCartPostEventHandler, OrderByNamePost
 
     public boolean isDefaultOrderByPrice() {
         return defaultOrderByPrice;
+    }
+
+    public JFrame getFrame() {
+        return jFrame;
     }
 
     public void createAndShowGUI() {
